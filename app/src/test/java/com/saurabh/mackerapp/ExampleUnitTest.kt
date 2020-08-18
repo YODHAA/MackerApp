@@ -1,5 +1,6 @@
 package com.saurabh.mackerapp
 
+import com.saurabh.mackerapp.dto.Plant
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
