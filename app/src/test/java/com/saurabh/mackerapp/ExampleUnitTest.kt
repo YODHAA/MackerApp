@@ -23,6 +23,6 @@ class ExampleUnitTest {
     @Test
     fun confirm_plant_species() {
         val plant: Plant = Plant("Lily ", "Karnataka", "India")
-        assertEquals("Lily", plant.toString())
+        assertEquals("India", plant.toString())
     }
 }
