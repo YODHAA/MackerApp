@@ -1,5 +1,6 @@
 package com.saurabh.mackerapp
 
+import com.saurabh.mackerapp.dto.Plant
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -17,5 +18,11 @@ class ExampleUnitTest {
     @Test
     fun addition_isCorrect_Output() {
         assertEquals(5, 2 + 3)
+    }
+
+    @Test
+    fun confirm_plant_species() {
+        val plant: Plant = Plant("Lily ", "Karnataka", "India")
+        assertEquals("India", plant.toString())
     }
 }
