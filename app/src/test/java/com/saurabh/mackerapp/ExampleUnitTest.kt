@@ -18,4 +18,10 @@ class ExampleUnitTest {
     fun addition_isCorrect_Output() {
         assertEquals(5, 2 + 3)
     }
+
+    @Test
+    fun confirm_plant_species() {
+        val plant: Plant = Plant("Lily ", "Karnataka", "India")
+        assertEquals("Lily", plant.toString())
+    }
 }
