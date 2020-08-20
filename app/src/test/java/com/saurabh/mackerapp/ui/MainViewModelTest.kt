@@ -38,12 +38,14 @@ class MainViewModelTest {
         givenAFeedOfMockedPlantDataAreAvailable()
         whenSearchForPlant()
         thenResultContainsPlant()
-        // thenVerifyFunctionsInvoked()
+        thenVerifyFunctionsInvoked()
 
     }
 
     private fun thenVerifyFunctionsInvoked() {
+        // fetchPlants is called with Param Redbud
         verify { plantService.fetchPlants("Redbud") }
+        // fetchPlants is never called with Param Maple
         verify(exactly = 0) { plantService.fetchPlants("Maple") }
         confirmVerified(plantService)
     }
