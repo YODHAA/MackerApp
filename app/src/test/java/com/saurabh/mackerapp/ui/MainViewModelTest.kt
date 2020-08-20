@@ -6,21 +6,21 @@ import com.saurabh.mackerapp.dto.Plant
 import com.saurabh.mackerapp.service.PlantService
 import io.mockk.confirmVerified
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
-import org.mockito.Mock
 
 class MainViewModelTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
     lateinit var mvm: MainViewModel
 
-    @Mock
-    lateinit var plantService: PlantService
+
+    var plantService = mockk<PlantService>()
 
     @Before
     fun setup() {
@@ -35,9 +35,9 @@ class MainViewModelTest {
 
     @Test
     fun searchforplant_returnplant() {
-        thenResultContainPlant()
-        whensearchforplant()
-        givenAFeedofPlantdataAvailable()
+        givenAFeedOfMockedPlantDataAreAvailable()
+        whenSearchForPlant()
+        thenResultContainsPlant()
         // thenVerifyFunctionsInvoked()
 
     }
@@ -48,15 +48,21 @@ class MainViewModelTest {
         confirmVerified(plantService)
     }
 
+    private fun givenAFeedOfMockedPlantDataAreAvailable() {
+        mvm = MainViewModel()
+        //plantService = PlantService()
+        createMockData()
+    }
+
     private fun createMockData() {
-        var allPlantsLiveData = MutableLiveData<ArrayList<Plant>>()
-        var allPlants = ArrayList<Plant>()
+        val allPlantsLiveData = MutableLiveData<ArrayList<Plant>>()
+        val allPlants = ArrayList<Plant>()
         // create and add plants to our collection.
-        var redbud = Plant("Cercis", "canadensis", "Eastern Redbud")
+        val redbud = Plant("Cercis", "canadensis", "Eastern Redbud")
         allPlants.add(redbud)
-        var redOak = Plant("Quercus", "rubra", "Red Oak")
+        val redOak = Plant("Quercus", "rubra", "Red Oak")
         allPlants.add(redOak)
-        var whiteOak = Plant("Quercus", "alba", "White Oak")
+        val whiteOak = Plant("Quercus", "alba", "White Oak")
         allPlants.add(whiteOak)
         allPlantsLiveData.postValue(allPlants)
         every { plantService.fetchPlants(or("Redbud", "Quercus")) } returns allPlantsLiveData
@@ -74,18 +80,13 @@ class MainViewModelTest {
 
     }
 
-    private fun thenResultContainPlant() {
-        mvm = MainViewModel()
-        plantService = PlantService()
-        createMockData()
-    }
 
-    private fun whensearchforplant() {
+    private fun whenSearchForPlant() {
         mvm.fetchPlants("Redbud")
 
     }
 
-    private fun givenAFeedofPlantdataAvailable() {
+    private fun thenResultContainsPlant() {
         var plantFound = false
         mvm.plants.observeForever {
             assertNotNull(it)
@@ -95,15 +96,15 @@ class MainViewModelTest {
                     plantFound = true
                 }
             }
+            assertTrue(plantFound)
         }
-        assertTrue(plantFound)
     }
 
     @Test
     fun `search for garbage and return nothing `() {
-        givenAFeedofPlantdataAvailable()
+        //givenAFeedOfMockedPlantDataAreAvailable()
+        mvm = MainViewModel()
         mvm.fetchPlants("abcd")
-        createMockData()
         mvm.plants.observeForever {
             assertEquals(0, it.size)
         }
