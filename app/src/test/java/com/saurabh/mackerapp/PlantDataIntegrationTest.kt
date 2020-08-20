@@ -1,16 +1,21 @@
-package com.saurabh.mackerapp.ui
+package com.saurabh.mackerapp
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import com.saurabh.mackerapp.dto.Plant
 import com.saurabh.mackerapp.service.PlantService
+import com.saurabh.mackerapp.ui.MainViewModel
+import io.mockk.confirmVerified
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 
-class MainViewModelTest {
+class PlantDataIntegrationTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
     lateinit var mvm: MainViewModel
@@ -34,12 +39,50 @@ class MainViewModelTest {
         givenAFeedOfMockedPlantDataAreAvailable()
         whenSearchForPlant()
         thenResultContainsPlant()
+        thenVerifyFunctionsInvoked()
+
+    }
+
+    private fun thenVerifyFunctionsInvoked() {
+        // fetchPlants is called with Param Redbud
+        verify { plantService.fetchPlants("Redbud") }
+        // fetchPlants is never called with Param Maple
+        verify(exactly = 0) { plantService.fetchPlants("Maple") }
+        confirmVerified(plantService)
     }
 
     private fun givenAFeedOfMockedPlantDataAreAvailable() {
         mvm = MainViewModel()
         //plantService = PlantService()
+        createMockData()
     }
+
+    private fun createMockData() {
+        val allPlantsLiveData = MutableLiveData<ArrayList<Plant>>()
+        val allPlants = ArrayList<Plant>()
+        // create and add plants to our collection.
+        val redbud = Plant("Cercis", "canadensis", "Eastern Redbud")
+        allPlants.add(redbud)
+        val redOak = Plant("Quercus", "rubra", "Red Oak")
+        allPlants.add(redOak)
+        val whiteOak = Plant("Quercus", "alba", "White Oak")
+        allPlants.add(whiteOak)
+        allPlantsLiveData.postValue(allPlants)
+        every { plantService.fetchPlants(or("Redbud", "Quercus")) } returns allPlantsLiveData
+        every {
+            plantService.fetchPlants(
+                not(
+                    or(
+                        "Redbud",
+                        "Quercus"
+                    )
+                )
+            )
+        } returns MutableLiveData<ArrayList<Plant>>()
+        mvm.plantService = plantService
+
+    }
+
 
     private fun whenSearchForPlant() {
         mvm.fetchPlants("Redbud")

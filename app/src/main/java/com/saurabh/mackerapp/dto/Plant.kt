@@ -1,6 +1,13 @@
 package com.saurabh.mackerapp.dto
 
-data class Plant(var genus: String, var species: String, var common: String) {
+import com.google.gson.annotations.SerializedName
+
+data class Plant(
+    var genus: String,
+    var species: String,
+    var common: String,
+    @SerializedName("id") var plantId: Int = 0
+) {
     constructor() : this("", "", "")
 
     override fun toString(): String {
